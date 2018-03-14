@@ -21,7 +21,7 @@ namespace _2th.Entities
         [Required]
         [MaxLength(255)]
         public string TagName { get; set; }
-
+        public string Img { get; set; }
 
 
     }
