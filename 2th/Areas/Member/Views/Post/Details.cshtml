@@ -50,6 +50,9 @@
     </dl>
 </div>
 <p>
+    <div>
+        Export Data : @Html.ActionLink("Export to PDF", "GetPDF", new { id = Model.Id }))
+    </div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

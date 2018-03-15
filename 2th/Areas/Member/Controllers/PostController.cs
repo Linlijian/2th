@@ -10,12 +10,17 @@ using _2th.Entities;
 using _2th.Models;
 using System.IO;
 using Microsoft.AspNet.Identity;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using System.Web.Helpers;
+
 
 namespace _2th.Areas.Member.Controllers
 {
     public class PostController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private object iTextSharp;
 
         // GET: Member/Post
         public ActionResult Index()
@@ -132,6 +137,61 @@ namespace _2th.Areas.Member.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public ActionResult GetPDF(int? id)
+        {
+            Post post = db.Posts.Find(id);
+            string title = post.Title.ToString();
+            string tagname = post.TagName.ToString();
+            string auther = post.Auther.ToString();
+            string content = post.Content.ToString();
+
+            Document pdfDoc = new Document(PageSize.A4, 25, 25, 25, 15);
+            PdfWriter pdfWriter = PdfWriter.GetInstance(pdfDoc, Response.OutputStream);
+            pdfDoc.Open();
+
+            Chunk chunk = new Chunk("2th PDF", FontFactory.GetFont("Arial", 20,BaseColor.MAGENTA));
+            pdfDoc.Add(chunk);
+                        
+
+            PdfPTable table = new PdfPTable(2);
+            table.WidthPercentage = 100;
+            table.HorizontalAlignment = 0;
+            table.SpacingBefore = 20f;
+            table.SpacingAfter = 30f;
+
+
+            PdfPCell cell = new PdfPCell();
+            cell.Border = 0;
+            Image image = Image.GetInstance(Server.MapPath("~/Content/img/") + post.Img.ToString());
+            image.ScaleAbsolute(200, 150);
+            cell.AddElement(image);
+            table.AddCell(cell);
+
+            BaseFont bf = BaseFont.CreateFont(Server.MapPath("~/Content/font/ITIM-REGULAR.TTF"), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            Font font = new Font(bf, 18);
+            Paragraph para = new Paragraph("Title : " + title + "\n",font);                        
+            para.Add(content + "\n");
+            para.Add("Tag : " + tagname + "\n");
+            para.Add("By : " + auther+ "\n");
+            cell = new PdfPCell();
+            cell.Border = 0;
+            cell.AddElement(para);
+            table.AddCell(cell);
+                       
+            pdfDoc.Add(table);
+
+            pdfWriter.CloseStream = false;
+            pdfDoc.Close();
+            Response.Buffer = true;
+            Response.ContentType = "application/pdf";
+            Response.AddHeader("content-disposition", "attachment;filename=2th-pdf.pdf");
+            Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            Response.Write(pdfDoc);
+            Response.End();
+
+            return View();
         }
     }
 }
