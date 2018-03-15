@@ -52,14 +52,17 @@ namespace _2th.Areas.Member.Controllers
         {
             if (ModelState.IsValid)
             {
-                file.SaveAs(HttpContext.Server.MapPath("~/Content/img/")
-                                                  + file.FileName);
-                post.Img = file.FileName;
+                
+                    file.SaveAs(HttpContext.Server.MapPath("~/Content/img/")
+                                  + file.FileName);
+                    post.Img = file.FileName;
 
 
-                db.Posts.Add(post);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                    db.Posts.Add(post);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                
+
             }
 
             return View(post);
